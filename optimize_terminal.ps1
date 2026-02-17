@@ -20,19 +20,39 @@ if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue)) {
     winget install JanDeDobbeleer.OhMyPosh -s winget --accept-source-agreements --accept-package-agreements
 }
 
-# 2. Install Nerd Font (Meslo)
-# Using a direct download to avoid winget complexity for fonts
-$fontName = "MesloLGLNerdFont-Regular.ttf"
-$fontUrl = "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Meslo/M/Regular/MesloLGLNerdFont-Regular.ttf"
-$destPath = "$env:TEMP\$fontName"
+# 2. Install Nerd Font (Meslo) via Zip (More reliable)
+$fontZip = "$env:TEMP\Meslo.zip"
+$fontDir = "$env:TEMP\MesloFont"
+$fontUrl = "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
 
-Write-Host "Downloading Meslo Nerd Font..."
-Invoke-WebRequest -Uri $fontUrl -OutFile $destPath
+Write-Host "Downloading Meslo Nerd Font... (This might take a moment)"
+try {
+    Invoke-WebRequest -Uri $fontUrl -OutFile $fontZip
+    
+    Write-Host "Extracting font..."
+    Expand-Archive -Path $fontZip -DestinationPath $fontDir -Force
+    
+    $fontFile = Get-ChildItem -Path $fontDir -Filter "*MesloLG*NerdFont-Regular.ttf" | Select-Object -First 1
+    
+    if ($fontFile) {
+        Write-Host "Installing $($fontFile.Name)..."
+        $shell = New-Object -ComObject Shell.Application
+        $fontsFolder = $shell.Namespace(0x14) # 0x14 = Fonts
+        $fontsFolder.CopyHere($fontFile.FullName)
+        Write-Host "Font installed successfully!" -ForegroundColor Green
+    }
+    else {
+        Write-Error "Could not find the specific font file in the extracted archive."
+    }
+}
+catch {
+    Write-Warning "Font installation failed. You may need to run 'oh-my-posh font install meslo' manually."
+    Write-Warning "Error: $_"
+}
 
-Write-Host "Installing Font... (A popup might appear to confirm)"
-$shell = New-Object -ComObject Shell.Application
-$fontsFolder = $shell.Namespace(0x14) # 0x14 = Fonts
-$fontsFolder.CopyHere($destPath)
+# Cleanup
+Remove-Item $fontZip -ErrorAction SilentlyContinue
+Remove-Item $fontDir -Recurse -ErrorAction SilentlyContinue
 
 # 3. Install Terminal-Icons Module
 Write-Host "Installing Terminal-Icons module..."

@@ -52,6 +52,6 @@ These are applied by the script to fix common Windows performance bottlenecks.
 ## 📂 File Structure
 - `install_dev_env.ps1`: The main automation script. Reads linear instructions to install all components.
 - `setup_guide.md`: A human-readable step-by-step guide if you prefer manual installation.
-- `optimize_terminal.ps1`: Customizes PowerShell with Oh My Posh themes, fonts, and Linux aliases.
+- `optimize_terminal.ps1`: Customizes PowerShell. **Note**: If the font installation fails, run `oh-my-posh font install meslo` manually.
 - `setup_github_ssh.ps1`: Helper script to generate SSH keys and add them to your GitHub account.
 - `verify_setup.ps1`: A script to validate that all tools are correctly installed and available in the PATH.
