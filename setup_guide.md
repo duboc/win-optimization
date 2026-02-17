@@ -67,8 +67,7 @@ To make PowerShell feel more like Zsh/Bash (with theming and aliases):
    ```powershell
    ./optimize_terminal.ps1
    ```
-2. Restart Windows Terminal.
-3. In Terminal Settings -> Defaults -> Appearance, set the **Font face** to `MesloLGL Nerd Font` (or similar Nerd Font).
+2. Restart Windows Terminal. The font and theme should now be active.
 
 ### GitHub SSH Setup
 To authenticate with GitHub securely without passwords:

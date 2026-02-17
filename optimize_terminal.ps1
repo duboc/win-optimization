@@ -58,9 +58,13 @@ Remove-Item $fontDir -Recurse -ErrorAction SilentlyContinue
 Write-Host "Installing Terminal-Icons module..."
 Install-Module -Name Terminal-Icons -Repository PSGallery -Force -SkipPublisherCheck -Scope CurrentUser
 
-# 5. Configure Profile
-if (-not (Test-Path $PROFILE)) {
-    New-Item -Type File -Path $PROFILE -Force
+# 5. Configure Profile (All Hosts)
+$profilePath = $PROFILE.CurrentUserAllHosts
+if (-not (Test-Path $profilePath)) {
+    if (-not (Test-Path (Split-Path $profilePath))) {
+        New-Item -ItemType Directory -Path (Split-Path $profilePath) -Force | Out-Null
+    }
+    New-Item -Type File -Path $profilePath -Force | Out-Null
 }
 
 $profileConfig = @"
@@ -87,10 +91,34 @@ Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -EditMode Windows
 "@
 
-Add-Content -Path $PROFILE -Value $profileConfig
+Add-Content -Path $profilePath -Value $profileConfig
+
+# 6. Configure Windows Terminal Settings (Auto-set Font)
+Write-Host "Configuring Windows Terminal Fonts..."
+try {
+    $settingsPath = Get-ChildItem "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState\settings.json" | Select-Object -First 1 -ExpandProperty FullName
+    
+    if ($settingsPath -and (Test-Path $settingsPath)) {
+        $json = Get-Content $settingsPath -Raw | ConvertFrom-Json
+        
+        # Ensure hierarchy exists
+        if (-not $json.profiles) { $json | Add-Member -MemberType NoteProperty -Name "profiles" -Value @{} }
+        if (-not $json.profiles.defaults) { $json.profiles | Add-Member -MemberType NoteProperty -Name "defaults" -Value @{} }
+        
+        # Set Font
+        $fontObj = @{ face = "MesloLGL Nerd Font" }
+        $json.profiles.defaults | Add-Member -MemberType NoteProperty -Name "font" -Value $fontObj -Force
+        
+        # Save back
+        $json | ConvertTo-Json -Depth 10 | Set-Content $settingsPath
+        Write-Host "Windows Terminal settings updated! Font set to 'MesloLGL Nerd Font'." -ForegroundColor Green
+    } else {
+        Write-Warning "Could not find Windows Terminal settings.json. Please set font manually."
+    }
+} catch {
+    Write-Warning "Failed to update Windows Terminal settings safely: $_"
+}
 
 Write-Host "=== Customization Complete! ===" -ForegroundColor Green
 Write-Host "1. Restart Windows Terminal."
-Write-Host "2. Go to Settings -> Profiles -> Defaults -> Appearance."
-Write-Host "3. Set 'Font face' to 'MesloLGL Nerd Font'."
-Write-Host "4. Enjoy your new shell!"
+Write-Host "2. Enjoy your new shell!"
