@@ -32,7 +32,8 @@ try {
     Write-Host "Extracting font..."
     Expand-Archive -Path $fontZip -DestinationPath $fontDir -Force
     
-    $fontFile = Get-ChildItem -Path $fontDir -Filter "*MesloLG*NerdFont-Regular.ttf" | Select-Object -First 1
+    # Explicitly pick the non-DZ version to match the "MesloLGL Nerd Font" name in settings
+    $fontFile = Get-ChildItem -Path $fontDir -Filter "MesloLGLNerdFont-Regular.ttf" | Select-Object -First 1
     
     if ($fontFile) {
         Write-Host "Installing $($fontFile.Name)..."
@@ -112,10 +113,12 @@ try {
         # Save back
         $json | ConvertTo-Json -Depth 10 | Set-Content $settingsPath
         Write-Host "Windows Terminal settings updated! Font set to 'MesloLGL Nerd Font'." -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Warning "Could not find Windows Terminal settings.json. Please set font manually."
     }
-} catch {
+}
+catch {
     Write-Warning "Failed to update Windows Terminal settings safely: $_"
 }
 
