@@ -61,6 +61,15 @@ code --install-extension ms-python.vscode-pylance
 code --install-extension tamasfe.even-better-toml
 ```
 
+### Terminal Customization (For Linux Users)
+To make PowerShell feel more like Zsh/Bash (with theming and aliases):
+1. Run the customization script:
+   ```powershell
+   ./optimize_terminal.ps1
+   ```
+2. Restart Windows Terminal.
+3. In Terminal Settings -> Defaults -> Appearance, set the **Font face** to `MesloLGL Nerd Font` (or similar Nerd Font).
+
 ### GitHub SSH Setup
 To authenticate with GitHub securely without passwords:
 1. Run the provided helper script:
