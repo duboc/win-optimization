@@ -62,12 +62,12 @@ code --install-extension tamasfe.even-better-toml
 ```
 
 ### Terminal Customization (For Linux Users)
-To make PowerShell feel more like Zsh/Bash (with theming and aliases):
+To make PowerShell feel more like Zsh/Bash:
 1. Run the customization script:
    ```powershell
    ./optimize_terminal.ps1
    ```
-2. Restart Windows Terminal. The font and theme should now be active.
+2. Restart Windows Terminal. You will have a clean, text-based prompt with git integration.
 
 ### GitHub SSH Setup
 To authenticate with GitHub securely without passwords:
